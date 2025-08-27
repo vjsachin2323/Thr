@@ -1,0 +1,17 @@
+# terraform.tfvars.example
+region        = "us-east-1"
+vpc_id        = "vpc-1234567890abcdef0"
+subnet_id     = "subnet-1234567890abcdef0"
+key_pair_name = "image-builder-keypair"
+
+linux_parent_image   = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2-x86/2023.11.12"
+windows_parent_image = "arn:aws:imagebuilder:us-east-1:aws:image/windows-server-2022-english-full-base-x86/2023.11.15"
+
+common_tags = {
+  Project     = "Healthcare-AMI-Hardening"
+  CostCenter  = "IT-Infrastructure"
+  Owner       = "Infrastructure-Team"
+  Department  = "Healthcare"
+  Compliance  = "HIPAA"
+  DataClass   = "PHI"
+}
