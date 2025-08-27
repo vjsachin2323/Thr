@@ -1,0 +1,35 @@
+name: HealthcareCompliance
+description: Healthcare-specific compliance requirements (HIPAA, HITRUST)
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: AuditConfiguration
+        action: ExecuteBash
+        inputs:
+          commands:
+            - "yum install -y audit"
+            - "cat > /etc/audit/audit.rules << EOF"
+            - "-w /etc/passwd -p wa -k identity"
+            - "-w /etc/group -p wa -k identity"
+            - "-w /etc/shadow -p wa -k identity"
+            - "-w /var/log/secure -p wa -k authentication"
+            - "EOF"
+            - "systemctl enable auditd"
+            - "systemctl start auditd"
+            
+      - name: FileIntegrityMonitoring
+        action: ExecuteBash
+        inputs:
+          commands:
+            - "yum install -y aide"
+            - "aide --init"
+            - "mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz"
+            
+      - name: LogConfiguration
+        action: ExecuteBash
+        inputs:
+          commands:
+            - "echo '*.info;mail.none;authpriv.none;cron.none /var/log/messages' >> /etc/rsyslog.conf"
+            - "echo 'authpriv.* /var/log/secure' >> /etc/rsyslog.conf"
+            - "systemctl restart rsyslog"
