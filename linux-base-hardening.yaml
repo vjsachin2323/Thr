@@ -1,0 +1,32 @@
+name: LinuxBaseHardening
+description: Base Linux security hardening for healthcare environment
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: UpdateSystem
+        action: ExecuteBash
+        inputs:
+          commands:
+            - "#!/bin/bash"
+            - "yum update -y --security"
+            - "yum install -y awscli jq fail2ban clamav"
+            
+      - name: SSHHardening
+        action: ExecuteBash
+        inputs:
+          commands:
+            - "sed -i 's/^#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config"
+            - "sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config"
+            - "echo 'Protocol 2' >> /etc/ssh/sshd_config"
+            - "echo 'MaxAuthTries 3' >> /etc/ssh/sshd_config"
+            - "systemctl restart sshd"
+            
+      - name: FirewallConfiguration
+        action: ExecuteBash
+        inputs:
+          commands:
+            - "systemctl enable firewalld"
+            - "systemctl start firewalld"
+            - "firewall-cmd --permanent --add-service=ssh"
+            - "firewall-cmd --reload"
